@@ -1,30 +1,33 @@
-from mirror.celery import celery
+from __future__ import absolute_import
+from .celery import celery
+
+from celery import Task
 
 import logging
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
-class ShellTask(celery.Task):
+class ShellTask(Task):
 
     def run(self, commandline):
         return self._subprocess_popen(commandline)
 
     def _subprocess_popen(self, commandline):
         from subprocess import Popen, PIPE
-        logger.info("Running command %s" % commandline)
+        log.info("Running command %s" % commandline)
         p = Popen(commandline, shell=True, stdout=PIPE, stderr=PIPE)
         stdout, stderr = p.communicate()
 
         meta = {'returncode': p.returncode, 'stdout': stdout, 'stderr': stderr}
-        logger.info("Return code: %s" % p.returncode)
+        log.info("Return code: %s" % p.returncode)
         log_err = stderr or False
         if p.returncode != 0:
             celery.current_task.update_state(state='FAILURE', meta=meta)
             log_err = True
         if log_err:
-            logger.error("Stderr: %s" % stderr)
+            log.error("Stderr: %s" % stderr)
 
-        logger.debug("Stdout: %s" % stdout)
+        log.debug("Stdout: %s" % stdout)
 
         return p.returncode, stdout, stderr
 
@@ -34,13 +37,11 @@ class ShellTask(celery.Task):
 
 @celery.task
 def run_update():
-    pass
-
-
+    log.info("Testing")
 
 
 @celery.task
 def process_results(results):
     return_code, stdout, stderr = results
-    logger.info("Results: %s %s %s" % (return_code, stdout, stderr))
+    log.info("Results: %s %s %s" % (return_code, stdout, stderr))
     return results
