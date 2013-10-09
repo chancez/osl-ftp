@@ -1,13 +1,10 @@
-from celery import Celery, Task
-from celery.utils.log import get_task_logger
+from mirror.celery import celery
 
-logger = get_task_logger(__name__)
+import logging
 
-BROKER_URL = 'amqp://guest@33.33.33.10:5672//'
-celery = Celery('tasks', backend=BROKER_URL, broker=BROKER_URL)
+logger = logging.getLogger(__name__)
 
-
-class ShellTask(Task):
+class ShellTask(celery.Task):
 
     def run(self, commandline):
         return self._subprocess_popen(commandline)
@@ -33,6 +30,14 @@ class ShellTask(Task):
 
     # def on_success(self, retval, task_id, *args, **kwargs):
     #     super(ShellTask, self).on_success(retval, task_id, *args, **kwargs)
+
+
+@celery.task
+def run_update():
+    pass
+
+
+
 
 @celery.task
 def process_results(results):
