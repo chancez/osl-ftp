@@ -1,8 +1,6 @@
 Getting Started
 ===============
 
-Running with the configuration settings:
+Running the celery worker:
 
-`celery worker --config celeryconfig`
-
-
+`celery worker --config=celeryconfig --loglevel=info --beat`
