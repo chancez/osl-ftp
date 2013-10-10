@@ -2,13 +2,9 @@ from __future__ import absolute_import
 
 from celery import Celery
 
-celery = Celery('proj.celery')
+celery = Celery(__name__)
 
-import celeryconfig
-
-celery.config_from_object(celeryconfig)
-
-# Optional configuration, see the application user guide.
+celery.config_from_object('celeryconfig')
 
 if __name__ == '__main__':
     celery.start()

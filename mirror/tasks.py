@@ -1,15 +1,17 @@
 from __future__ import absolute_import
-from .celery import celery
-
-from celery import Task
+from mirror.celery import celery
 
 import logging
 
 log = logging.getLogger(__name__)
 
-class ShellTask(Task):
+class ShellTask(celery.Task):
+
+    def __init__(self, *args, **kwargs):
+        self.name = 'mirror.tasks.ShellTask'
 
     def run(self, commandline):
+        self.cmd = commandline
         return self._subprocess_popen(commandline)
 
     def _subprocess_popen(self, commandline):
@@ -17,12 +19,15 @@ class ShellTask(Task):
         log.info("Running command %s" % commandline)
         p = Popen(commandline, shell=True, stdout=PIPE, stderr=PIPE)
         stdout, stderr = p.communicate()
-
-        meta = {'returncode': p.returncode, 'stdout': stdout, 'stderr': stderr}
+        self.meta = {
+            'returncode': p.returncode,
+            'stdout': stdout,
+            'stderr': stderr
+        }
         log.info("Return code: %s" % p.returncode)
         log_err = stderr or False
         if p.returncode != 0:
-            celery.current_task.update_state(state='FAILURE', meta=meta)
+            celery.current_task.update_state(state='FAILURE', meta=self.meta)
             log_err = True
         if log_err:
             log.error("Stderr: %s" % stderr)
@@ -31,13 +36,10 @@ class ShellTask(Task):
 
         return p.returncode, stdout, stderr
 
-    # def on_success(self, retval, task_id, *args, **kwargs):
-    #     super(ShellTask, self).on_success(retval, task_id, *args, **kwargs)
 
-
-@celery.task
+@celery.task(name='mirror.tasks.run_update')
 def run_update():
-    log.info("Testing")
+    log.info("Updating Mirror")
 
 
 @celery.task
