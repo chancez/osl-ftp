@@ -3,7 +3,7 @@ from __future__ import absolute_import
 import ConfigParser
 from celery.schedules import crontab
 
-class DictParser(ConfigParser.ConfigParser):
+class MirrorConfParser(ConfigParser.ConfigParser):
 
     def as_dict(self):
         d = dict(self._sections)
