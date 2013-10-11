@@ -1,4 +1,5 @@
 *.pyc
+*pycache*
 
 .vagrant
 Berksfile.lock
