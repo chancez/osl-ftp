@@ -1,5 +1,4 @@
-amqp
-anyjson
-celery==3.0.24
-pytz
-six
+Twisted==13.1.0
+argparse==1.2.1
+wsgiref==0.1.2
+zope.interface==4.0.5

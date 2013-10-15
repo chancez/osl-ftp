@@ -18,15 +18,15 @@ class MirrorConfParser(ConfigParser.ConfigParser):
 def config_to_schedule(raw_config):
     schedule = {}
     for section, config in raw_config.as_dict().iteritems():
-        schedule_args = extract_schedule(config)
+        # schedule_args = extract_schedule(config)
         cmd = config.get('cmd', None)
-        schedule.update({
-            section: {
-                'task': 'mirror.tasks.ShellTask',
-                'schedule': crontab(**schedule_args),
-                'args': (cmd,)
-            }
-        })
+        # schedule.update({
+        #     section: {
+        #         'task': 'mirror.tasks.ShellTask',
+        #         'schedule': crontab(**schedule_args),
+        #         'args': (cmd,)
+        #     }
+        # })
 
     return schedule
 
